@@ -14,6 +14,6 @@
  
 ---
 # Architecture Diagram
-This is a simplified architecture diagram to my kubernetes cluster which was created using standard-config on GCP
+This is a simplified architecture diagram of my kubernetes cluster which was created using standard-config on GCP
 ![alt text](https://github.com/belisky/demo_crmv4/blob/main/Kubernetes_mongo(2).png?raw=true)
   
