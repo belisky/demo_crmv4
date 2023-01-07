@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.name }}
+  labels:
+    app: {{ .Values.deployment.labels_app }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.deployment.matchLabels_app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployment.labels_app }}
+    spec:
+      containers:
+      - name: {{ .Values.deployment.container_name }}
+        image: {{ .Values.deployment.image }}
+        ports:
+        - containerPort: {{ .Values.deployment.containerPort }}
+        env:
+        - name: MONGODB_URI
+          value: "mongodb://$(MONGO_INITDB_ROOT_USERNAME):$(MONGO_INITDB_ROOT_PASSWORD)@mongo-mongodb-headless.default.svc.cluster.local:27017/$(MONGO_DATABASE)"
+        envFrom:
+          - configMapRef:
+              name: mongodb-config
+          - secretRef:
+              name: mongo-secret
