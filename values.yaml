@@ -1,0 +1,59 @@
+config:
+  name: "mongodb-config"
+  log_level: "info"
+  persistence: "true"
+  mongo_db: "demo"
+  mongodb_uri: "mongodb://$(MONGO_INITDB_ROOT_USERNAME):$(MONGO_INITDB_ROOT_PASSWORD)@mongo-mongodb-headless.default.svc.cluster.local:27017/$(MONGO_DATABASE)"      
+ 
+secret:
+  name: "mongo-secret"
+  username: "root"
+  password: "pass"
+
+service:
+  name: "demo-crm-service"
+  app: "demo-crm"
+  type: ClusterIP
+  protocol: TCP
+  port: 80
+  targetPort: 3000
+
+deployment:
+  labels_app: demo-crm
+  matchLabels_app: demo-crm
+  name: "demo-crm-deployment"
+  replicas: 1
+  container_name: "demo-crm"
+  image: "pwstaging/demo-crm:latest"
+  containerPort: 3000
+  configMapRef_name: "mongodb-config"
+  secretRef_name: "mongo-secret"
+  mongo_uri: "mongodb://$(MONGO_INITDB_ROOT_USERNAME):$(MONGO_INITDB_ROOT_PASSWORD)@mongo-mongodb-headless.default.svc.cluster.local:27017/$(MONGO_DATABASE)"
+
+ingress: 
+  enabled: true
+  name: "demo-crm-ingress"
+  host: "bcrm.ddns.net"
+  secretName: "bel-crm-account-key-z4cmq"
+  nameOfBindingSvc: "demo-crm-service"
+  portNumber: 80
+
+issuer:
+  name: "letsencrypt-production"
+  email: "fiawornunobel@gmail.com"
+  privateKeySecretRef: "bel-crm-account-key-z4cmq"
+
+mongodb: 
+  replicaCount: 3
+  architecture: replicaset
+  useStatefulSet: true
+  username: "root"
+  password: "pass"
+  database: "demo"
+
+cronjob:
+  enabled: true
+  image: docker.io/bitnami/mongodb:6.0.3
+  secretRef : cleaner_secret
+  schedule: "@midnight"
+
